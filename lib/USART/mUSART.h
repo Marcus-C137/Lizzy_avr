@@ -7,6 +7,6 @@
 void USART0_init(void);
 void USART0_sendChar(char c);
 void dMsg(char *str);
-
+void dIMsg(int val);
 
 #endif

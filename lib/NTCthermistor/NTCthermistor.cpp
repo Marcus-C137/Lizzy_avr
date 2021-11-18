@@ -46,12 +46,12 @@ void NTCthermistor::read(void)
     average = _serialRes * average;
 
     float steinhart;
-    steinhart = average / _nomRes;     // (R/Ro)
-    steinhart = log(steinhart);                  // ln(R/Ro)
-    steinhart /= _bCoef;                   // 1/B * ln(R/Ro)
-    steinhart += 1.0 / (25.0 + 273.15); // + (1/To)
-    steinhart = 1.0 / steinhart;                 // Invert
-    steinhart -= 273.15;                         // convert to C
+    steinhart = average / _nomRes;              // (R/Ro)
+    steinhart = log(steinhart);                 // ln(R/Ro)
+    steinhart /= _bCoef;                        // 1/B * ln(R/Ro)
+    steinhart += 1.0 / (25.0 + 273.15);         // + (1/To)
+    steinhart = 1.0 / steinhart;                // Invert
+    steinhart -= 273.15;                        // convert to C
     steinhart = (steinhart * (9.0/5.0)) + 32;
     temp = (int) (steinhart*10.0);
     if (temp > 15 && temp < 2000){

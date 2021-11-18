@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include "NTCthermistor.h"
 
+volatile int setTemps[4] = {0};
+volatile int gains[4] = {0};
+volatile bool portsOn[4] = {0};
+
 void heatinit(void){ //Heating Output
 
     //set as output
@@ -24,7 +28,7 @@ void heatinit(void){ //Heating Output
     PORTB.DIRCLR = PIN4_bm;
     PORTB.PIN4CTRL = PORT_PULLUPEN_bm | PORT_ISC_RISING_gc;
     
-    TCA0_SINGLE_CTRLA |= 0b00000011; //Prescaler 2
+    TCA0_SINGLE_CTRLA |= 0b00000011; //Prescaler 2 & Enable
     TCA0_SINGLE_CTRLESET &= ~(1 << 0); //Timer A count up
 
     uint16_t startTop = 5130; //~ 2ms
@@ -72,29 +76,29 @@ void heatinit(void){ //Heating Output
     TCB0_CTRLA |= (1 << 0); 
     TCB1_CTRLA |= (1 << 0); 
     TCB2_CTRLA |= (1 << 0); 
-    TCB3_CTRLA |= (1 << 0);   
+    TCB3_CTRLA |= (1 << 0);
 
 }
 
 void heatLoop(void){
-    heatOut(&thstor1, 1);
-    heatOut(&thstor2, 2);
-    heatOut(&thstor3, 3);
-    heatOut(&thstor4, 4);
+    heatOut(&curSens1, &thstor1, 1);
+    heatOut(&curSens2, &thstor2, 2);
+    heatOut(&curSens3, &thstor3, 3);
+    heatOut(&curSens4, &thstor4, 4);
 }
 
-void heatOut(NTCthermistor *thstor, int heatPort){
+void heatOut(ACS712 *curSens, NTCthermistor *thstor, int heatPort){
+
     int portOn = 0;
     uint16_t timeOn = 100;
-    int setTemp = 1000;
+    int setTemp = 900;
     thstor->read();
+    curSens->read(); 
     int tempDiff = setTemp - thstor->temp;
     if(tempDiff > 200) tempDiff = 200;
-    if (tempDiff > 0 && thstor->connected){
+    if (tempDiff > 0 && thstor->connected && !curSens->overcurrent){
         timeOn = ((tempDiff/10) * -1000) + 20100;
         portOn = 1;
-        char buf[10]; sprintf(buf, "%d", timeOn);
-        dMsg(buf);
     }
     if (heatPort == 1) {TCB0_CCMP = timeOn; TCB0.INTCTRL = portOn;} 
     if (heatPort == 2) {TCB1_CCMP = timeOn; TCB1.INTCTRL = portOn;}

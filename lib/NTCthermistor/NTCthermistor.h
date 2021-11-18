@@ -14,9 +14,9 @@ class NTCthermistor
         uint16_t _serialRes;
 
     public:
+        NTCthermistor(adc_0_channel_t adcPin, uint16_t nomRes, uint16_t bCoef, uint16_t serialRes);
         int temp;
         bool connected;
-        NTCthermistor(adc_0_channel_t adcPin, uint16_t nomRes, uint16_t bCoef, uint16_t serialRes);
         void read(void);
     
 };

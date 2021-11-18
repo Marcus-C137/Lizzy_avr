@@ -3,6 +3,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <string.h>
+#include <stdio.h>
 
 
 void USART0_init(void)
@@ -38,4 +39,10 @@ void dMsg(char *str)
     USART0_sendChar('\n');
 
 
+}
+
+void dIMsg(int val){
+    char buf[10];
+    sprintf(buf, "%d", val);
+    dMsg(buf);
 }
